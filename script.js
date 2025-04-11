@@ -20,6 +20,8 @@ startButton.addEventListener('click', startGame)
 nextButton.addEventListener('click', () => {
     currentQuestionIndex++
     setNextQuestion()
+    // the below function removes the classes "correct" and "wrong" from the html body.
+    clearStatusClass(document.body)
 })
 // variable define the keyword 'let' allow you to change its values many times.
 let shuffledQuestions, currentQuestionIndex
@@ -42,6 +44,8 @@ function startGame()
     questionContainerElement.classList.remove('hide')
     // this function sets the next question.
     setNextQuestion()
+    // the below function removes the classes "correct" and "wrong" from the html body.
+    clearStatusClass(document.body)
 }
 
 function setNextQuestion()
@@ -69,59 +73,96 @@ function showQuestion(question)
         button.innerText=answer.text
         // below line gives 'btn' class to the to the newly created unused button element.
         button.classList.add('btn')
-        // as we know that in the every answer of the answers array there is two element one represent the text(string) and other one represent the that the current answer is correct or not by giving them boolean literals.
+        // as we know that in the every answer of the answers array there is two element one represent the text(string) and other one represent that the current answer is correct or not by giving them boolean literals.
+        // if block will allow entry to those answer whose correct member has true value.
         if (answer.correct) {
+            // below line is creating custom data attribute (data-correct) in the button block and assign it the value of correct member of asnwer. (answer.correct) in the if block is always true because this is the only condition because of which it enters in to the if block. if the value of answer.correct is false then it fails to enter the if block.
             button.dataset.correct=answer.correct
         }
+        // now the below line of code defines that what will happen if someone click on newly created unused button.
+        // when someone click on the button it calls selectanswer() function.
         button.addEventListener('click', selectAnswer)
+        // now finally the below line is responsble for using the unused button it basically append the newly created button to the block of html which holds the other buttons.
         answerButtonsElement.appendChild(button)
     });
 }
 
 function resetState()
 {
+    // below line is responsible for hiding the next button because we want that next button would only appear when user click on any options.
     nextButton.classList.add('hide')
+    // below line initiates the while loop with the entry condition that it will iterate only run when there exist a child in that html element which was pointed by answerButtonsElement (it is basically the block which hold all the answer buttons).
     while(answerButtonsElement.firstChild)
     {
+        // answerButtonsElement.removeChild this tells what it do.
+        // answerButtonsElement.firstChild this tell to whom it do.
+        // it basically remove the first child of that html element which is pointed by answerButtonsElement.
         answerButtonsElement.removeChild(answerButtonsElement.firstChild)
     }
-
 }
-
+// in the calling of the below function no arguement was passed but in the defintion of the function there is a parameter. 
+// So whenever this type function was called by the event listener then in that case java script automatically consider parameter of the function as event object which tells us the following things:
+// here e is not the keyword it can be anything but the thing written after dot can't be anything.
+// 1. e.type = Type of event (e.g., "click", "keydown").
+// 2. e.target = The actual HTML element that triggered the event.
+// 3. e.clientX & e.clientY = X and Y coordinates of the mouse pointer (for mouse events).
+// 4. e.key = The key that was pressed (for keyboard events).
+// 5. e.timeStamp = time when the event occur.
+// 6. e.currentTarget = Not the actual HTML element but the js variable in this case it const button that triggered the event.
 function selectAnswer(e)
 {
+    // selectedButton will be connected to that element on which the event occured.
     const selectedButton=e.target
+    // if the selected buttonn (or option) has the correct: true then the value of constant variable correct will be true othervise undefined as we fill data-correct only when the value is true not for the false. 
     const correct = selectedButton.dataset.correct
+    // so below line contain the funtion setStatusClass which is responsible for giving the class named "correct" or class named "wrong" to the body of the html on the basis of second arguement of setStatusClass(___, Correct)
     setStatusClass(document.body, correct)
+    // answerButtonsElement.children this is to reprsent the HTML collection and this is not a array just a collection.
+    // so to run a 'for loop' over this collection we first convert it into js array.
+    // button => and this is same method we studied earlier in "question.answers.forEach(answer =>" and in python for loop "for i in list:".
     Array.from(answerButtonsElement.children).forEach(button => {
+        // in the below line we again use the setStatusClass function for assigning class "correct" or "wrong" to the button on the basis of button.dataset.correct this criteria.
         setStatusClass(button, button.dataset.correct)
     })
+    // now the below if and else block determining whether we have to show start button (restart button) or the next button.
+    // shuffledQuestions.length>currentQuestionIndex+1 for understanding this lets say we have 5 questions and we are on fifth or last one( for last one currentQuestionIndex+1=5)(shuffledQuestions.length=5) and we set our code in such a way that it show next button (to move to the next question) or restart button (to restart the quiz) after click on any option. 
+    // if we are on last question so next button should not appear and this is what our condition do (5>5) which is false. 
     if (shuffledQuestions.length>currentQuestionIndex+1)
     {
+        // below line is for unhiding the next button 
         nextButton.classList.remove('hide')
     }
     else
     {
+        // below line changes the contect of the start button to restart because our start button here act as a restarter of the quiz.
         startButton.innerText='Restart'
+        // // below line is for unhiding the start button
         startButton.classList.remove('hide')
     }
 }
 
 function setStatusClass(element, correct)
 {
+    // below function is responsible for removing the current "correct" or "wrong" class from any element
     clearStatusClass(element)
+    // if the sencond arguement of the setStatusClass (correct) has the value then the if block runs
     if (correct)
     {
+        // it gives class named "correct" to the the first arguement of the setStatusClass
         element.classList.add('correct')
     }
     else {
+        // // it gives class named "wrong" to the the first arguement of the setStatusClass
         element.classList.add('wrong')
     }
 }
 
+// below function is responsible for the removal of class named "correct" and class named "wrong" the element
 function clearStatusClass(element)
 {
+    // below line removes the class named "correct" from the element
     element.classList.remove('correct')
+    // below line removes the class named "wrong" from the element
     element.classList.remove('wrong')
 }
 
